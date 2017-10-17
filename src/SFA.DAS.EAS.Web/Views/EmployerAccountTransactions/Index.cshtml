@@ -26,7 +26,7 @@
             Your transactions
             <span class="heading-secondary">@displayingMonthDate.ToGdsFormatWithoutDay()</span>
         </h1>
-         
+
         @if (Model.Data.IsLatestMonth)
         {
             <div class="data-wrap">
@@ -51,7 +51,7 @@
                     </dl>
                 </div>
             </div>
-        }
+                            }
     </div>
 </div>
 <div class="grid-row">
@@ -127,7 +127,7 @@
 
                             <td class="link-right">
                                 @if (aggregationLine.TransactionType == TransactionItemType.Declaration ||
-         aggregationLine.TransactionType == TransactionItemType.TopUp)
+aggregationLine.TransactionType == TransactionItemType.TopUp)
                                 {
                                     <a title="View details for the transaction on @date" href="@Url.Action("LevyDeclarationDetail", "EmployerAccountTransactions", new {HashedAccountId = Model.Data.Model.Data.HashedAccountId, fromDate, toDate})">
                                         Details <span class="vh"> for the transaction on @date</span>
@@ -171,23 +171,14 @@
             }
         </ul>
 
-        <details class="feedback">
-            <summary><span class="summary">Help us improve this section</span></summary>
-            <div class="survey">
-                <script id="ss-embed-396029">
-                    (function (d, w) {
-                        var s, ss; ss = d.createElement('script');
-                        ss.type = 'text/javascript';
-                        ss.async = true;
-                        ss.src = ('https:' == d.location.protocol ? 'https://' : 'http://') + 'www.smartsurvey.co.uk/s/r/embed.aspx?i=350750&c=396029';
-                        s = d.getElementsByTagName('script')[0];
-                        s.parentNode.insertBefore(ss, s);
-                    })(document, window);
-                </script>              
-            </div>
-        </details>
+        @*<details class="feedback">
+                <summary><span class="summary">Help us improve this section</span></summary>
+                <div class="survey">
 
-       
+                </div>
+            </details>*@
+
+
     </div>
 </div>
 @section breadcrumb {
@@ -198,3 +189,26 @@
         </ol>
     </div>
 }
+
+@*@section pageSpecificJS{
+        <script id="ss-embed-396029">
+            (function (d, w) {
+                var ss = d.createElement('script'), parent = d.getElementsByClassName("survey");
+                ss.type = 'text/javascript';
+                ss.async = true;
+                ss.src = ('https:' === d.location.protocol ? 'https://' : 'http://') + 'www.smartsurvey.co.uk/s/r/embed.aspx?i=350750&c=396029';
+
+                ss.addEventListener('load', function(e) {
+                    var iframe = d.getElementsByTagName('iframe');
+                    parent[0].appendChild(iframe[0]);
+                    setTimeout(function() {
+                            $('html,body').scrollTop(0);
+                        },
+                        840);
+                });
+
+                d.body.appendChild(ss);
+                //s.parentNode.insertBefore(ss, s);
+            })(document, window);
+        </script>
+    }*@
