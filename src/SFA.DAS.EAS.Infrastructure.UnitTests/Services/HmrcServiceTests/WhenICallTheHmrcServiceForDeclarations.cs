@@ -9,6 +9,7 @@ using SFA.DAS.EAS.Domain.Http;
 using SFA.DAS.EAS.Domain.Interfaces;
 using SFA.DAS.EAS.Domain.Models.HmrcLevy;
 using SFA.DAS.EAS.Infrastructure.Services;
+using SFA.DAS.NLog.Logger;
 using SFA.DAS.TokenService.Api.Client;
 using SFA.DAS.TokenService.Api.Types;
 
@@ -30,6 +31,7 @@ namespace SFA.DAS.EAS.Infrastructure.UnitTests.Services.HmrcServiceTests
         private Mock<IHttpClientWrapper> _httpClientWrapper;
         private Mock<ITokenServiceApiClient> _tokenService;
         private Mock<IAzureAdAuthenticationService> _azureAdAuthService;
+        private Mock<ILog> _logger;
 
 
         [SetUp]
@@ -54,6 +56,7 @@ namespace SFA.DAS.EAS.Infrastructure.UnitTests.Services.HmrcServiceTests
             };
 
             _httpClientWrapper = new Mock<IHttpClientWrapper>();
+            _logger = new Mock<ILog>();
 
             _tokenService = new Mock<ITokenServiceApiClient>();
             _tokenService.Setup(x => x.GetPrivilegedAccessTokenAsync()).ReturnsAsync(new PrivilegedAccessToken { AccessCode = ExpectedAuthToken });
@@ -64,7 +67,7 @@ namespace SFA.DAS.EAS.Infrastructure.UnitTests.Services.HmrcServiceTests
                         _configuration.Hmrc.AzureResourceId, _configuration.Hmrc.AzureTenant))
                 .ReturnsAsync( ExpectedAuthToken);
 
-            _hmrcService = new HmrcService( _configuration, _httpClientWrapper.Object, _tokenService.Object, new NoopExecutionPolicy(), null, _azureAdAuthService.Object);
+            _hmrcService = new HmrcService( _configuration, _httpClientWrapper.Object, _tokenService.Object, new NoopExecutionPolicy(), null, _azureAdAuthService.Object, _logger.Object);
         }
         
         [Test]
@@ -139,6 +142,23 @@ namespace SFA.DAS.EAS.Infrastructure.UnitTests.Services.HmrcServiceTests
             //Assert
             _tokenService.Verify(x=>x.GetPrivilegedAccessTokenAsync(),Times.Never);
             _azureAdAuthService.Verify(x=>x.GetAuthenticationResult(_configuration.Hmrc.ClientId, _configuration.Hmrc.AzureAppKey,_configuration.Hmrc.AzureResourceId,_configuration.Hmrc.AzureTenant),Times.Once);
+        }
+
+        [Test]
+        public async Task ShouldReturnNullIfDeclarationNotFound()
+        {
+            //Arrange
+            var expectedApiUrl = $"apprenticeship-levy/epaye/{HttpUtility.UrlEncode(EmpRef)}/declarations?fromDate=2017-04-01";
+            
+            _httpClientWrapper.Setup(x => x.Get<LevyDeclarations>(It.IsAny<string>(), expectedApiUrl))
+                              .ThrowsAsync(new ResourceNotFoundException(string.Empty));
+
+            //Act
+            var result = await _hmrcService.GetLevyDeclarations(EmpRef);
+
+            //Assert
+            Assert.IsNull(result);
+            
         }
     }
 }

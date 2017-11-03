@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Web;
@@ -12,6 +13,7 @@ using SFA.DAS.EAS.Domain.Models.HmrcEmployer;
 using SFA.DAS.EAS.Domain.Models.HmrcLevy;
 using SFA.DAS.EAS.Infrastructure.Caching;
 using SFA.DAS.EAS.Infrastructure.ExecutionPolicies;
+using SFA.DAS.NLog.Logger;
 using SFA.DAS.TokenService.Api.Client;
 
 namespace SFA.DAS.EAS.Infrastructure.Services
@@ -24,9 +26,17 @@ namespace SFA.DAS.EAS.Infrastructure.Services
         private readonly ExecutionPolicy _executionPolicy;
         private readonly ICacheProvider _cacheProvider;
         private readonly IAzureAdAuthenticationService _azureAdAuthenticationService;
+        private readonly ILog _logger;
 
 
-        public HmrcService(EmployerApprenticeshipsServiceConfiguration configuration, IHttpClientWrapper httpClientWrapper, ITokenServiceApiClient tokenServiceApiClient, [RequiredPolicy(HmrcExecutionPolicy.Name)] ExecutionPolicy executionPolicy, ICacheProvider cacheProvider, IAzureAdAuthenticationService azureAdAuthenticationService)
+        public HmrcService(
+            EmployerApprenticeshipsServiceConfiguration configuration, 
+            IHttpClientWrapper httpClientWrapper, 
+            ITokenServiceApiClient tokenServiceApiClient, 
+            [RequiredPolicy(HmrcExecutionPolicy.Name)] ExecutionPolicy executionPolicy, 
+            ICacheProvider cacheProvider, 
+            IAzureAdAuthenticationService azureAdAuthenticationService,
+            ILog logger)
         {
             _configuration = configuration;
             _httpClientWrapper = httpClientWrapper;
@@ -34,6 +44,7 @@ namespace SFA.DAS.EAS.Infrastructure.Services
             _executionPolicy = executionPolicy;
             _cacheProvider = cacheProvider;
             _azureAdAuthenticationService = azureAdAuthenticationService;
+            _logger = logger;
 
             _httpClientWrapper.BaseUrl = _configuration.Hmrc.BaseUrl;
             _httpClientWrapper.AuthScheme = "Bearer";
@@ -123,7 +134,19 @@ namespace SFA.DAS.EAS.Infrastructure.Services
                     url += defaultFromDate;
                 }
 
-                return await _httpClientWrapper.Get<LevyDeclarations>(accessToken, url);
+                LevyDeclarations declarations;
+
+                //try
+                //{
+                    declarations = await _httpClientWrapper.Get<LevyDeclarations>(accessToken, url);
+                //}
+                //catch (ResourceNotFoundException ex)
+                //{
+                    
+                //}
+
+                return declarations;
+
             });
         }
 

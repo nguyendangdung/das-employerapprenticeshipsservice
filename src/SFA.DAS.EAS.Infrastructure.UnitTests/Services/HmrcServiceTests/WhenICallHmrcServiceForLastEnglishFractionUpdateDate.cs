@@ -6,6 +6,7 @@ using SFA.DAS.EAS.Domain.Configuration;
 using SFA.DAS.EAS.Domain.Http;
 using SFA.DAS.EAS.Infrastructure.Caching;
 using SFA.DAS.EAS.Infrastructure.Services;
+using SFA.DAS.NLog.Logger;
 using SFA.DAS.TokenService.Api.Client;
 using SFA.DAS.TokenService.Api.Types;
 
@@ -51,7 +52,7 @@ namespace SFA.DAS.EAS.Infrastructure.UnitTests.Services.HmrcServiceTests
                 .Returns(null)
                 .Returns(new DateTime());
 
-            _hmrcService = new HmrcService(_configuration, _httpClientWrapper.Object, _tokenService.Object, new NoopExecutionPolicy(),_cacheProvider.Object,null);
+            _hmrcService = new HmrcService(_configuration, _httpClientWrapper.Object, _tokenService.Object, new NoopExecutionPolicy(),_cacheProvider.Object,null, Mock.Of<ILog>());
         }
 
         [Test]
