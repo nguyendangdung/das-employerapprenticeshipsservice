@@ -5142,6 +5142,31 @@ h2 .float-right {
   margin: 10px 0 0 0px;
 }
 
+.js-enabled #user-nav li.has-sub-menu > a:before {
+  border-left-color: #fff;
+}
+
+.js-enabled #user-nav li.has-sub-menu.open > a {
+  color: #4c2c92;
+}
+
+.js-enabled #user-nav li.open li > a {
+  color: #4c2c92;
+}
+
+.floating-menu nav#user-nav #settings-menu a.sub-menu-item {
+  color: #4c2c92;
+}
+
+.header-organisation ul li.menu-link > a {
+  top: auto;
+}
+
+.floating-menu nav#user-nav #settings-menu a.sub-menu-item {
+  color: #fff;
+  color: #4c2c92 !important;
+}
+
 /* - END floating menu style */
 @media only screen and (max-device-width: 640px), only screen and (max-device-width: 667px), only screen and (max-width: 480px) {
   #apprentice-details .tableResponsive {
