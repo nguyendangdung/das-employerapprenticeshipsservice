@@ -707,22 +707,21 @@ body {
         }
 }
 
+/*Download transactions page UI*/
+#download-transactions{
+    .column-one-third{
+        @include media(tablet) {width:45%;} 
+       width:100%;
+     
+    }
+    .column-one-quarter{
+           @include media(tablet) {width:10%; }
+        width:100%;
+        text-align:center;
+    }
 
-/*#page-activity{
-    .timeline--complete{
-        li.last{
-           p.activity{
-               padding-left:0;
-               &:before{
-                background:none;
-               }
-           }
-           p.meta{
-               padding-left:0;
-           }
-        }
-    }   
-}*/
+}
+
 
 //remove yellow outline around selected tabs
 .js-enabled ul.js-tabs a.selected{outline:none;}
