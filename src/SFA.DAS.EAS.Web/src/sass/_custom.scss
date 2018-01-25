@@ -710,22 +710,14 @@ body {
 /*Download transactions page UI*/
 #download-transactions {
     .column-one-third {
-        @include media(tablet) {
-            width: 45%;
-        }
-
+        @include media(tablet) {width: 45%;}
         width: 100%;
     }
-
     .column-one-quarter {
-        @include media(tablet) {
-            width: 10%;
-        }
-
+        @include media(tablet) {width: 10%;}
         width: 100%;
         text-align: center;
     }
-
     .grey-rounded {
         background: $grey-1;
         color: #fff;
@@ -735,12 +727,11 @@ body {
         height: 45px;
         margin: 40px auto;
         @include media(tablet) {margin:0;}
-
-        .rounded-text {
-            display: block;
-            padding: 13px 10px 10px 9px;
-            font-weight:bold;
-        }
+            .rounded-text {
+                display: block;
+                padding: 13px 10px 10px 9px;
+                font-weight:bold;
+            }
     }
 }
 
