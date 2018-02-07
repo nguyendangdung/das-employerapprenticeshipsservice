@@ -5,6 +5,7 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Web;
 using HMRC.ESFA.Levy.Api.Client;
+using HMRC.ESFA.Levy.Api.Types;
 using Newtonsoft.Json;
 using SFA.DAS.EAS.Domain.Configuration;
 using SFA.DAS.EAS.Domain.Http;
@@ -82,7 +83,7 @@ namespace SFA.DAS.EAS.Infrastructure.Services
         {
             return await _executionPolicy.ExecuteAsync(async () =>
             {
-                var response =  await _apprenticeshipLevyApiClient.GetAllEmployers(authToken);
+                var response = await _apprenticeshipLevyApiClient.GetAllEmployers(authToken);
 
                 if (response == null)
                     return string.Empty;

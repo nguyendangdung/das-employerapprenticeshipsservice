@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Linq;
+using System.Net.Http;
 using System.Reflection;
 using AutoMapper;
+using HMRC.ESFA.Levy.Api.Client;
 using MediatR;
 using SFA.DAS.EAS.Domain.Configuration;
 using SFA.DAS.EAS.Domain.Data.Repositories;
@@ -37,6 +39,8 @@ namespace SFA.DAS.EAS.LevyDeclarationProvider.Worker.DependencyResolution
             RegisterMapper();
             AddMediatrRegistrations();
             RegisterLogger();
+
+            RegisterApprenticeshipLevyApiClient(config.Hmrc);
         }
 
         private void RegisterExecutionPolicies()
@@ -86,6 +90,12 @@ namespace SFA.DAS.EAS.LevyDeclarationProvider.Worker.DependencyResolution
                 x.ParentType,
                 null,
                 null)).AlwaysUnique();
+        }
+
+        private void RegisterApprenticeshipLevyApiClient(HmrcConfiguration config)
+        {
+            var httpClient = new HttpClient {BaseAddress = new Uri(config.BaseUrl)};
+            For<IApprenticeshipLevyApiClient>().Use<ApprenticeshipLevyApiClient>().Ctor<HttpClient>().Is(httpClient);
         }
 
         private void ConfigureHashingService(EmployerApprenticeshipsServiceConfiguration config)

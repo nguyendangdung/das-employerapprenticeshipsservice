@@ -50,6 +50,9 @@
     <Reference Include="Hashids.net, Version=1.2.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Hashids.net.1.2.2\lib\net45\Hashids.net.dll</HintPath>
     </Reference>
+    <Reference Include="HMRC.ESFA.Levy.Api.Client">
+      <HintPath>..\packages\HMRC.ESFA.Levy.Api.Client.1.0.43\lib\net452\HMRC.ESFA.Levy.Api.Client.dll</HintPath>
+    </Reference>
     <Reference Include="HMRC.ESFA.Levy.Api.Types, Version=1.0.43.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\HMRC.ESFA.Levy.Api.Types.1.0.43\lib\net452\HMRC.ESFA.Levy.Api.Types.dll</HintPath>
     </Reference>
@@ -269,6 +272,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DependencyResolution\ApprenticeshipLevyRegistry.cs" />
     <Compile Include="DependencyResolution\AuditRegistry.cs" />
     <Compile Include="DependencyResolution\CachesRegistry.cs" />
     <Compile Include="DependencyResolution\CommitmentsRegistry.cs" />
