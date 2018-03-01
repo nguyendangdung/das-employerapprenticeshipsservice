@@ -39,14 +39,14 @@ namespace SFA.DAS.EAS.Application.UnitTests.Commands.UpdateEnglishFractions
                 new DasEnglishFraction
                 {
                     Id = "1",
-                    DateCalculated = DateTime.Parse(DateTime.Today.AddDays(-20).ToShortDateString()),
+                    DateCalculated = DateTime.Today.AddDays(-20),
                     EmpRef = _employerReference,
                     Amount = 0.45M
                 },
                 new DasEnglishFraction
                 {
                     Id = "2",
-                    DateCalculated = DateTime.Parse(DateTime.Today.AddDays(-10).ToShortDateString()),
+                    DateCalculated = DateTime.Today.AddDays(-10),
                     EmpRef = _employerReference,
                     Amount = 0.5M
                 }

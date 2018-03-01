@@ -50,7 +50,8 @@ namespace SFA.DAS.EAS.Infrastructure.UnitTests.Services.HmrcServiceTests
 
             _apprenticeshipLevyApiClient = new Mock<IApprenticeshipLevyApiClient>();
 
-            _hmrcService = new HmrcService(_configuration, _httpClientWrapper.Object, _apprenticeshipLevyApiClient.Object, _tokenService.Object, new NoopExecutionPolicy(), null,null);
+            _hmrcService = new HmrcService(_configuration, _httpClientWrapper.Object,
+                _apprenticeshipLevyApiClient.Object, _tokenService.Object, new NoopExecutionPolicy(), null, null);
         }
 
         [Test]
