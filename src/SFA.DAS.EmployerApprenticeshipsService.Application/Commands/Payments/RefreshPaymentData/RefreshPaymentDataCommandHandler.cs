@@ -95,6 +95,9 @@ namespace SFA.DAS.EAS.Application.Commands.Payments.RefreshPaymentData
             }
 
             _logger.Info($"Finished publishing ProcessPaymentEvent and PaymentCreatedMessage messages for AccountId = '{message.AccountId}' and PeriodEnd = '{message.PeriodEnd}'");
+
+			 await _messagePublisher.PublishAsync(new AccountPaymentsProcessingFinishedMessage(
+			                        message.AccountId, message.PeriodEnd, string.Empty, string.Empty));
         }
     }
 }
