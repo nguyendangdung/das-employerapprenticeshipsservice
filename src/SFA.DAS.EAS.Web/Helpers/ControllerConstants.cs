@@ -74,5 +74,6 @@
         public const string ViewTeamViewName = "ViewTeam";
         public const string WhatYoullNeedActionName = "WhatYoullNeed";
         public const string TransferDetailsForSenderViewName = "TransferDetailsForSender";
+        public const string TransferDetailsForReceiverViewName = "TransferDetailsForReceiver";
     }
 }

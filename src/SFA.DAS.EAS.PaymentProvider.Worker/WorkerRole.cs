@@ -8,6 +8,7 @@ using SFA.DAS.Messaging.AzureServiceBus.StructureMap;
 using SFA.DAS.Messaging.Interfaces;
 using SFA.DAS.NLog.Logger;
 using StructureMap;
+using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
@@ -39,6 +40,10 @@ namespace SFA.DAS.EAS.PaymentProvider.Worker
                 }
 
                 Task.WaitAll(processorTasks, _cancellationTokenSource.Token);
+            }
+            catch (OperationCanceledException)
+            {
+                Trace.TraceInformation("SFA.DAS.EAS.PaymentProvider.Worker has been cancelled");
             }
             finally
             {
