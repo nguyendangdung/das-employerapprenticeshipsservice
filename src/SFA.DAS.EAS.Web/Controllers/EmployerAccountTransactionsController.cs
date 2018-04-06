@@ -2,6 +2,7 @@
 using MediatR;
 using SFA.DAS.EAS.Application.Queries.GetAccountTransferTransactionDetails;
 using SFA.DAS.EAS.Application.Queries.GetTransactionsDownloadResultViewModel;
+using SFA.DAS.EAS.Application.Queries.GetTransferTransactionDetails;
 using SFA.DAS.EAS.Domain.Interfaces;
 using SFA.DAS.EAS.Web.Attributes;
 using SFA.DAS.EAS.Web.Authentication;
@@ -13,7 +14,6 @@ using SFA.DAS.HashingService;
 using System;
 using System.Threading.Tasks;
 using System.Web.Mvc;
-using SFA.DAS.EAS.Application.Queries.GetTransferTransactionDetails;
 
 namespace SFA.DAS.EAS.Web.Controllers
 {
@@ -132,7 +132,7 @@ namespace SFA.DAS.EAS.Web.Controllers
 
             var model = _mapper.Map<TransferSenderTransactionDetailsViewModel>(response);
 
-            return View(ControllerConstants.TransferDetailsForSenderViewName, model);
+            return View(ControllerConstants.TransferDetailsViewName, model);
         }
     }
 }
