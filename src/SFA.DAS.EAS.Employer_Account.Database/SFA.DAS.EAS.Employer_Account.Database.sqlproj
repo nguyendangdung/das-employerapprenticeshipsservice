@@ -142,6 +142,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Database.publish.xml" />
+    <None Include="Scripts\PreDeployment\RemoveDuplicateAccountHistory.sql" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\Invitation.sql" />

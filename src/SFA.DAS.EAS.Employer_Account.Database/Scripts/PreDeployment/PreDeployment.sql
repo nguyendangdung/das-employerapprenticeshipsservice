@@ -11,3 +11,5 @@
 */
 
 :r .\TransferConnectionInvitationDataMigration.sql
+:r .\RemoveDuplicateAccountHistory.sql
+
