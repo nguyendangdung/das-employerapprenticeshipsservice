@@ -128,6 +128,7 @@
     <None Include="SeedData\SeedData.sql" />
     <None Include="SeedData\SeedProdData.sql" />
     <None Include="Database.publish.xml" />
+    <None Include="SeedData\TransferTransactions.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="SeedData\PostDeploymentRules.sql" />
