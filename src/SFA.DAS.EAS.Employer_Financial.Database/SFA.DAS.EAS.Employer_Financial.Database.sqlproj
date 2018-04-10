@@ -68,6 +68,8 @@
     <Folder Include="SeedData" />
     <Folder Include="Types" />
     <Folder Include="Functions" />
+    <Folder Include="Scripts" />
+    <Folder Include="Scripts\PreDeployment" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\EnglishFraction.sql" />
@@ -117,20 +119,22 @@
     <Build Include="StoredProcedures\GetAccountPaymentsByPeriodEnd.sql" />
     <Build Include="Functions\GetPreviousFinancialYearDates.sql" />
     <Build Include="StoredProcedures\GetAllPeriodEnds.sql" />
+    <None Include="Scripts\PreDeployment\RemoveDuplicateLevyDeclarations.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="SeedData\SeedData.sql" />
     <None Include="SeedData\SeedProdData.sql" />
     <None Include="Database.publish.xml" />
+    <None Include="Scripts\PreDeployment\FixupTableColumns.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="SeedData\PostDeploymentRules.sql" />
     <None Include="SeedData\EnglishFraction.sql" />
   </ItemGroup>
   <ItemGroup>
-    <PreDeploy Include="Script.PreDeployment1.sql" />
+    <RefactorLog Include="SFA.DAS.EAS.Levy.Database.refactorlog" />
   </ItemGroup>
   <ItemGroup>
-    <RefactorLog Include="SFA.DAS.EAS.Levy.Database.refactorlog" />
+    <PreDeploy Include="Scripts\PreDeployment\PreDeployment.sql" />
   </ItemGroup>
 </Project>

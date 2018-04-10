@@ -29,3 +29,6 @@ GO
 
 CREATE INDEX [IX_LevyDeclaration_Account_Payroll] ON [employer_financial].[LevyDeclaration] (AccountId,PayrollMonth,PayrollYear)
 GO
+
+CREATE UNIQUE NONCLUSTERED INDEX [IDX_UNIQUE_LevyDeclaration_PayeSchemeRef_SubmissionId] on [employer_financial].[LevyDeclaration] (empref, submissionId)
+GO
