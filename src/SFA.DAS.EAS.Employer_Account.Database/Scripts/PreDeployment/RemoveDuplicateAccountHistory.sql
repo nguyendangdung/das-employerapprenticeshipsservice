@@ -18,13 +18,14 @@ END
 SET IDENTITY_INSERT [employer_account].[AccountHistoryNonUnique] ON
 
 INSERT [employer_account].[AccountHistoryNonUnique]([Id], [AccountId], [PayeRef], [AddedDate], [RemovedDate])
+
 SELECT [Id], [AccountId], [PayeRef], [AddedDate], [RemovedDate] FROM [employer_account].[AccountHistory]
 
 SET IDENTITY_INSERT [employer_account].[AccountHistoryNonUnique] OFF
 
 
 -- Clean up the duplicates
-DELETE ah FROM [SFA.DAS.EAS.Employer_Account.Database].[employer_account].[AccountHistory] ah
+DELETE ah FROM [employer_account].[AccountHistory] ah
 INNER JOIN (
 	SELECT h.AccountId, h.PayeRef, MIN(h.AddedDate) as minAddedDate
 	FROM employer_account.AccountHistory h
