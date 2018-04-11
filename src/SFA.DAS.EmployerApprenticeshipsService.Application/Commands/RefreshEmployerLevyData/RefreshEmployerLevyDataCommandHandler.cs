@@ -13,6 +13,7 @@ using SFA.DAS.EAS.Domain.Interfaces;
 using SFA.DAS.EAS.Domain.Models.HmrcLevy;
 using SFA.DAS.EAS.Domain.Models.Levy;
 using SFA.DAS.HashingService;
+using SFA.DAS.NLog.Logger;
 
 namespace SFA.DAS.EAS.Application.Commands.RefreshEmployerLevyData
 {
@@ -25,9 +26,10 @@ namespace SFA.DAS.EAS.Application.Commands.RefreshEmployerLevyData
         private readonly ILevyEventFactory _levyEventFactory;
         private readonly IGenericEventFactory _genericEventFactory;
         private readonly IHashingService _hashingService;
+        private readonly ILog _logger;
 
         public RefreshEmployerLevyDataCommandHandler(IValidator<RefreshEmployerLevyDataCommand> validator, IDasLevyRepository dasLevyRepository, IMediator mediator, IHmrcDateService hmrcDateService,
-            ILevyEventFactory levyEventFactory, IGenericEventFactory genericEventFactory, IHashingService hashingService)
+            ILevyEventFactory levyEventFactory, IGenericEventFactory genericEventFactory, IHashingService hashingService, ILog logger)
         {
             _validator = validator;
             _dasLevyRepository = dasLevyRepository;
@@ -36,6 +38,7 @@ namespace SFA.DAS.EAS.Application.Commands.RefreshEmployerLevyData
             _levyEventFactory = levyEventFactory;
             _genericEventFactory = genericEventFactory;
             _hashingService = hashingService;
+            _logger = logger;
         }
 
         protected override async Task HandleCore(RefreshEmployerLevyDataCommand message)
@@ -53,6 +56,8 @@ namespace SFA.DAS.EAS.Application.Commands.RefreshEmployerLevyData
             foreach (var employerLevyData in message.EmployerLevyData)
             {
                 var declarations = employerLevyData.Declarations.Declarations.OrderBy(c => c.SubmissionDate).ToArray();
+
+                declarations = FilterDuplicateHmrcDeclarations(employerLevyData.EmpRef, declarations);
 
                 declarations = await FilterActiveDeclarations(employerLevyData, declarations);
 
@@ -93,6 +98,22 @@ namespace SFA.DAS.EAS.Application.Commands.RefreshEmployerLevyData
             {
                 dasDeclaration.LevyDueYtd = null;
             }
+        }
+
+        /// <summary>
+        /// If there are any Submissions from Hmrc that have the same submission Id, we should discard all
+        /// but the first.
+        /// </summary>
+        private DasDeclaration[] FilterDuplicateHmrcDeclarations(string empRef, IEnumerable<DasDeclaration> declarations)
+        {
+            var dasDeclarations = declarations as DasDeclaration[] ?? declarations.ToArray();
+            var duplicateIds = dasDeclarations.GroupBy(d => d.SubmissionId).Where(g => g.Count() > 1)
+                .Select(s => s.First().SubmissionId).ToList();
+
+            duplicateIds.ForEach(submissionId =>
+                _logger.Info($"PayeScheme '{empRef}' has a duplicate submission id from Hmrc = '{submissionId}'"));
+
+            return dasDeclarations.GroupBy(x => x.SubmissionId).Select(s => s.First()).ToArray();
         }
 
         private async Task<DasDeclaration[]> FilterActiveDeclarations(EmployerLevyData employerLevyData, IEnumerable<DasDeclaration> declarations)
