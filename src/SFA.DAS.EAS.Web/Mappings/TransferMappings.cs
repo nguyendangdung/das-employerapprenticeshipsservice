@@ -60,7 +60,7 @@ namespace SFA.DAS.EAS.Web.Mappings
 
             CreateMap<TransferConnectionInvitationViewModel, DeleteTransferConnectionInvitationCommand>();
 
-            CreateMap<GetTransferTransactionDetailsResponse, TransferSenderTransactionDetailsViewModel>();
+            CreateMap<GetTransferTransactionDetailsResponse, TransferTransactionDetailsViewModel>();
 
         }
     }

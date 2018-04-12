@@ -123,6 +123,7 @@
     <Build Include="StoredProcedures\CreateAccountTransferTransactions.sql" />
     <Build Include="StoredProcedures\GetAccountTransfersByPeriodEnd.sql" />
     <Build Include="StoredProcedures\GetTransferTransactionDetails.sql" />
+    <Build Include="Types\TransferTransactionsTable.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="SeedData\SeedData.sql" />
