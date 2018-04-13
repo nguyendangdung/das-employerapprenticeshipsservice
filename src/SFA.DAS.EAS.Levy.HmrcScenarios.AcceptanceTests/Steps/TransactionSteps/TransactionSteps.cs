@@ -164,7 +164,7 @@ namespace SFA.DAS.EAS.Levy.HmrcScenarios.AcceptanceTests2.Steps.TransactionSteps
                 paymentsList.Add(payment);
             }
 
-            dasLevyRepository.CreatePaymentData(paymentsList).Wait();
+            dasLevyRepository.CreatePayments(paymentsList).Wait();
 
             ScenarioContext.Current["payments"] = paymentsList;
 

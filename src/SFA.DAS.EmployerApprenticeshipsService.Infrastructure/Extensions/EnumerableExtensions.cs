@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace SFA.DAS.EAS.DbMaintenance.WebJob.Extensions
+namespace SFA.DAS.EAS.Infrastructure.Extensions
 {
     public static class EnumerableExtensions
     {
