@@ -338,7 +338,7 @@ namespace SFA.DAS.EAS.Infrastructure.Data
                     commandType: CommandType.StoredProcedure);
             });
 
-            return result.ToArray();
+            return result;
         }
 
         public async Task ProcessPaymentData(long accountId)
