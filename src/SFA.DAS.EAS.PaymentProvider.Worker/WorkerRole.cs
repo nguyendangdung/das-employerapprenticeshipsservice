@@ -69,6 +69,7 @@ namespace SFA.DAS.EAS.PaymentProvider.Worker
 
             _cancellationTokenSource.Cancel();
             _runCompleteEvent.WaitOne();
+            _container?.Dispose();
 
             base.OnStop();
 

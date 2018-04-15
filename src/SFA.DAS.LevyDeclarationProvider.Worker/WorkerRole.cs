@@ -65,6 +65,7 @@ namespace SFA.DAS.EAS.LevyDeclarationProvider.Worker
 
             this._cancellationTokenSource.Cancel();
             this._runCompleteEvent.WaitOne();
+            this._container?.Dispose();
 
             base.OnStop();
 

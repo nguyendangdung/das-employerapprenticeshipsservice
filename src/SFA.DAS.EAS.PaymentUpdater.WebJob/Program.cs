@@ -18,6 +18,7 @@ namespace SFA.DAS.EAS.PaymentUpdater.WebJob
             var paymentUpdater = container.GetInstance<IPaymentProcessor>();
 
             paymentUpdater.RunUpdate().Wait();
+            container.Dispose();
         }
     }
 }

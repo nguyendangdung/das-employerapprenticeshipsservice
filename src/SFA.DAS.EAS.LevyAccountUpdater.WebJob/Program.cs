@@ -15,6 +15,7 @@ namespace SFA.DAS.EAS.LevyAccountUpdater.WebJob
             var updater = container.GetInstance<IAccountUpdater>();
 
             updater.RunUpdate().Wait();
+            container.Dispose();
         }
     }
 }

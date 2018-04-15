@@ -18,6 +18,7 @@ namespace SFA.DAS.EAS.Account.Worker
 
         private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
         private readonly ManualResetEvent _runCompleteEvent = new ManualResetEvent(false);
+        private IContainer _container;
 
         public override void Run()
         {
@@ -25,21 +26,7 @@ namespace SFA.DAS.EAS.Account.Worker
 
             try
             {
-                var container = new Container(c =>
-                {
-                    c.AddRegistry<CachesRegistry>();
-                    c.AddRegistry<ConfigurationRegistry>();
-                    c.AddRegistry<HashingRegistry>();
-                    c.AddRegistry<LoggerRegistry>();
-                    c.AddRegistry<MapperRegistry>();
-                    c.AddRegistry<MediatorRegistry>();
-                    c.AddRegistry<MessagePublisherRegistry>();
-                    c.AddRegistry<MessageSubscriberRegistry>();
-                    c.AddRegistry<RepositoriesRegistry>();
-                    c.AddRegistry<DefaultRegistry>();
-                });
-
-                var messageProcessors = container.GetAllInstances<IMessageProcessor>().ToList();
+                var messageProcessors = _container.GetAllInstances<IMessageProcessor>().ToList();
                 var tasks = messageProcessors.Select(p => p.RunAsync(_cancellationTokenSource)).ToArray();
 
                 Task.WaitAll(tasks);
@@ -67,6 +54,20 @@ namespace SFA.DAS.EAS.Account.Worker
             
             Logger.Info("SFA.DAS.EAS.Account.Worker has been started");
 
+            _container = new Container(c =>
+            {
+                c.AddRegistry<CachesRegistry>();
+                c.AddRegistry<ConfigurationRegistry>();
+                c.AddRegistry<HashingRegistry>();
+                c.AddRegistry<LoggerRegistry>();
+                c.AddRegistry<MapperRegistry>();
+                c.AddRegistry<MediatorRegistry>();
+                c.AddRegistry<MessagePublisherRegistry>();
+                c.AddRegistry<MessageSubscriberRegistry>();
+                c.AddRegistry<RepositoriesRegistry>();
+                c.AddRegistry<DefaultRegistry>();
+            });
+
             return result;
         }
 
@@ -76,6 +77,7 @@ namespace SFA.DAS.EAS.Account.Worker
 
             _cancellationTokenSource.Cancel();
             _runCompleteEvent.WaitOne();
+            _container?.Dispose();
 
             base.OnStop();
             
