@@ -86,8 +86,12 @@ namespace SFA.DAS.EAS.Application.Commands.Payments.RefreshPaymentData
 
             await _dasLevyRepository.CreatePayments(newPayments);
             await _mediator.PublishAsync(new ProcessPaymentEvent { AccountId = message.AccountId });
-            await Task.WhenAll(newPayments.Select(p => _messagePublisher.PublishAsync(new PaymentCreatedMessage(p.ProviderName, p.Amount, p.EmployerAccountId, string.Empty, string.Empty))));
-            
+
+            foreach (var payment in newPayments)
+            {
+                await _messagePublisher.PublishAsync(new PaymentCreatedMessage(payment.ProviderName, payment.Amount, payment.EmployerAccountId, string.Empty, string.Empty));
+            }
+
             _logger.Info($"Finished publishing ProcessPaymentEvent and PaymentCreatedMessage messages for AccountId = '{message.AccountId}' and PeriodEnd = '{message.PeriodEnd}'");
         }
     }
