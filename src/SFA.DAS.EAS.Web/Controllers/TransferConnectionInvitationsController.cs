@@ -13,6 +13,7 @@ using SFA.DAS.EAS.Application.Queries.GetTransferConnectionInvitationAccount;
 using SFA.DAS.EAS.Application.Queries.GetTransferConnectionRoles;
 using SFA.DAS.EAS.Web.Attributes;
 using SFA.DAS.EAS.Web.Extensions;
+using SFA.DAS.EAS.Web.Helpers;
 using SFA.DAS.EAS.Web.ViewModels.TransferConnectionInvitations;
 
 namespace SFA.DAS.EAS.Web.Controllers
@@ -77,6 +78,9 @@ namespace SFA.DAS.EAS.Web.Controllers
             switch (model.Choice)
             {
                 case "Confirm":
+                    model.SendTransferConnectionInvitationCommand.NotificationLink =
+                        Url.Action(ControllerConstants.TransfersActionName, ControllerConstants.TransfersControllerName);
+
                     var transferConnectionInvitationId = await _mediator.SendAsync(model.SendTransferConnectionInvitationCommand);
                     return RedirectToAction("Sent", new { transferConnectionInvitationId });
                 case "GoToTransfersPage":

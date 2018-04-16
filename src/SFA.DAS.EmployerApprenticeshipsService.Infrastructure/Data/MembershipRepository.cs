@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
@@ -6,6 +7,7 @@ using Dapper;
 using SFA.DAS.EAS.Domain.Configuration;
 using SFA.DAS.EAS.Domain.Data.Repositories;
 using SFA.DAS.EAS.Domain.Models.AccountTeam;
+using SFA.DAS.EAS.Domain.Models.UserProfile;
 using SFA.DAS.Sql.Client;
 using SFA.DAS.NLog.Logger;
 
@@ -147,6 +149,21 @@ namespace SFA.DAS.EAS.Infrastructure.Data
                    param: parameters,
                    commandType: CommandType.StoredProcedure);
            });
+        }
+
+        public async Task<IEnumerable<User>> GetAccountUsersByRole(long accountId, Role role)
+        {
+            return await WithConnection(async c =>
+            {
+                var parameters = new DynamicParameters();
+                parameters.Add("@accountId", accountId, DbType.Int64);
+                parameters.Add("@roleId", (int)role, DbType.Int16);
+
+                return await c.QueryAsync<User>(
+                    sql: "[employer_account].[GetAccountUsersByRole]",
+                    param: parameters,
+                    commandType: CommandType.StoredProcedure);
+            });
         }
     }
 }

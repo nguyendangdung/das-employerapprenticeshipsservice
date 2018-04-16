@@ -9,5 +9,7 @@ namespace SFA.DAS.EAS.Application.Commands.SendTransferConnectionInvitation
         [Required]
         [RegularExpression(Constants.AccountHashedIdRegex)]
         public string ReceiverAccountPublicHashedId { get; set; }
+
+        public string NotificationLink { get; set; }
     }
 }

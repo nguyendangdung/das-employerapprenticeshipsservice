@@ -68,6 +68,8 @@
         public const string SetupAccountViewName = "SetupAccount";
         public const string SignAgreementViewName = "SignAgreement";
         public const string SignInActionName = "SignIn";
+        public const string TransfersActionName = "Index";
+        public const string TransfersControllerName = "Transfers";
         public const string UserExternalIdClaimKeyName = "sub";
         public const string SummaryActionName = "Summary";
         public const string ViewTeamActionName = "ViewTeam";

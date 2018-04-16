@@ -260,6 +260,7 @@
     <Compile Include="Controllers\OrganisationSharedTests\WhenISearchForAnAddress.cs" />
     <Compile Include="Controllers\OrganisationSharedTests\WhenISelectAnAddress.cs" />
     <Compile Include="Controllers\OrganisationSharedTests\WhenIUpdateAnOrganisationsAddress.cs" />
+    <Compile Include="Helpers\ControllerHelper.cs" />
     <Compile Include="Controllers\TransferConnectionInvitationsControllerTests\WhenISubmitTheRejectedTransferConnectionInvitationPage.cs" />
     <Compile Include="Controllers\TransferConnectionInvitationsControllerTests\WhenISubmitTheApprovedTransferConnectionInvitationPage.cs" />
     <Compile Include="Controllers\TransferConnectionInvitationsControllerTests\WhenISubmitTheReceiveTransferConnectionInvitationPage.cs" />

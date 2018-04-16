@@ -1,5 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using SFA.DAS.EAS.Domain.Models.AccountTeam;
+using SFA.DAS.EAS.Domain.Models.UserProfile;
 
 namespace SFA.DAS.EAS.Domain.Data.Repositories
 {
@@ -13,5 +15,6 @@ namespace SFA.DAS.EAS.Domain.Data.Repositories
         Task<MembershipView> GetCaller(long accountId, string externalUserId);
         Task Create(long userId, long accountId, short roleId);
         Task SetShowAccountWizard(string hashedAccountId, string externalUserId, bool showWizard);
+        Task<IEnumerable<User>> GetAccountUsersByRole(long receiverAccountId, Role owner);
     }
 }

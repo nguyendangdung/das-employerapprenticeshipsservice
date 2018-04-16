@@ -5,6 +5,7 @@ using Moq;
 using NUnit.Framework;
 using SFA.DAS.EAS.Application.Commands.SendTransferConnectionInvitation;
 using SFA.DAS.EAS.Web.Controllers;
+using SFA.DAS.EAS.Web.UnitTests.Helpers;
 using SFA.DAS.EAS.Web.ViewModels.TransferConnectionInvitations;
 
 namespace SFA.DAS.EAS.Web.UnitTests.Controllers.TransferConnectionInvitationsControllerTests
@@ -34,7 +35,9 @@ namespace SFA.DAS.EAS.Web.UnitTests.Controllers.TransferConnectionInvitationsCon
         [Test]
         public async Task ThenASendTransferConnectionCommandShouldBeSentIfIChoseOption1()
         {
-           _viewModel.Choice = "Confirm";
+            ControllerHelper.SetUpTransfersIndexRoute(_controller);
+
+            _viewModel.Choice = "Confirm";
 
             await _controller.Send(_viewModel);
 
@@ -42,8 +45,24 @@ namespace SFA.DAS.EAS.Web.UnitTests.Controllers.TransferConnectionInvitationsCon
         }
 
         [Test]
+        public async Task ThenASendTransferConnectionCommandShouldBeSentWithALinkAddedIfIChoseOption1()
+        {
+            var transferIndexUrl = ControllerHelper.SetUpTransfersIndexRoute(_controller);
+
+            _viewModel.Choice = "Confirm";
+
+            await _controller.Send(_viewModel);
+
+            _mediator.Verify(m => m.SendAsync(It.Is<SendTransferConnectionInvitationCommand>(c =>
+                c == _viewModel.SendTransferConnectionInvitationCommand &&
+                c.NotificationLink == transferIndexUrl)), Times.Once);
+        }
+
+        [Test]
         public async Task ThenIShouldBeRedirectedToTheSentTransferConnectionPageIfIChoseOption1()
         {
+            ControllerHelper.SetUpTransfersIndexRoute(_controller);
+
             _viewModel.Choice = "Confirm";
 
             var result = await _controller.Send(_viewModel) as RedirectToRouteResult;
@@ -52,7 +71,8 @@ namespace SFA.DAS.EAS.Web.UnitTests.Controllers.TransferConnectionInvitationsCon
             Assert.That(result.RouteValues.TryGetValue("action", out var actionName), Is.True);
             Assert.That(actionName, Is.EqualTo("Sent"));
             Assert.That(result.RouteValues.ContainsKey("controller"), Is.False);
-            Assert.That(result.RouteValues.TryGetValue("transferConnectionInvitationId", out var transferConnectionId), Is.True);
+            Assert.That(result.RouteValues.TryGetValue("transferConnectionInvitationId", out var transferConnectionId),
+                Is.True);
             Assert.That(transferConnectionId, Is.EqualTo(TransferConnectionId));
         }
 
@@ -80,4 +100,4 @@ namespace SFA.DAS.EAS.Web.UnitTests.Controllers.TransferConnectionInvitationsCon
             Assert.That(controllerName, Is.EqualTo("Transfers"));
         }
     }
-}
+ }
