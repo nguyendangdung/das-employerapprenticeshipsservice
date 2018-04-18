@@ -125,6 +125,7 @@
     <Build Include="StoredProcedures\GetTransferTransactionDetails.sql" />
     <Build Include="Types\TransferTransactionsTable.sql" />
     <Build Include="Types\AccountTransferTable.sql" />
+    <Build Include="StoredProcedures\GetSenderAccountTransactionsInCurrentFinancialYear.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="SeedData\SeedData.sql" />
