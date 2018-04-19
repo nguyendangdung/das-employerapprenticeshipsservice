@@ -1,16 +1,16 @@
-﻿using System;
-using System.Net;
-using System.Threading.Tasks;
-using System.Web.Mvc;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using SFA.DAS.EAS.Domain.Interfaces;
 using SFA.DAS.EAS.Web.Authentication;
+using SFA.DAS.EAS.Web.Extensions;
+using SFA.DAS.EAS.Web.Helpers;
 using SFA.DAS.EAS.Web.Orchestrators;
 using SFA.DAS.EAS.Web.ViewModels;
 using SFA.DAS.EmployerUsers.WebClientComponents;
 using SFA.DAS.NLog.Logger;
-using SFA.DAS.EAS.Web.Extensions;
-using SFA.DAS.EAS.Web.Helpers;
+using System;
+using System.Net;
+using System.Threading.Tasks;
+using System.Web.Mvc;
 
 namespace SFA.DAS.EAS.Web.Controllers
 {
@@ -22,9 +22,9 @@ namespace SFA.DAS.EAS.Web.Controllers
         private readonly ILog _logger;
 
         public EmployerAccountController(IAuthenticationService owinWrapper, EmployerAccountOrchestrator employerAccountOrchestrator,
-            IFeatureToggleService featureToggle, IMultiVariantTestingService multiVariantTestingService, ILog logger, 
+            IFeatureToggleService featureToggle, IMultiVariantTestingService multiVariantTestingService, ILog logger,
             ICookieStorageService<FlashMessageViewModel> flashMessage)
-            : base(owinWrapper,multiVariantTestingService,flashMessage)
+            : base(owinWrapper, multiVariantTestingService, flashMessage)
         {
             if (employerAccountOrchestrator == null)
             {
@@ -34,7 +34,7 @@ namespace SFA.DAS.EAS.Web.Controllers
             _employerAccountOrchestrator = employerAccountOrchestrator;
             _logger = logger;
         }
-        
+
         // Not sure if this is used anymore, leaving here for now to see if it breaks when the automated tests are run
         // the redirect won't go anywhere so if it is called from somewhere we should expect a 404
         [HttpGet]
@@ -58,7 +58,7 @@ namespace SFA.DAS.EAS.Web.Controllers
                     BreadcrumbDescription = "Back to Your User Profile",
                     ConfirmUrl = Url.Action(ControllerConstants.GatewayViewName, ControllerConstants.EmployerAccountControllerName),
                 },
-             
+
             };
 
             var flashMessageViewModel = GetFlashMessageViewModelFromCookie();
@@ -92,13 +92,14 @@ namespace SFA.DAS.EAS.Web.Controllers
                     response.Status = HttpStatusCode.OK;
 
                     AddFlashMessageToCookie(response.FlashMessage);
-                    
+
                     return RedirectToAction(ControllerConstants.GatewayInformActionName);
                 }
 
-                var email = OwinWrapper.GetClaimValue(ControllerConstants.EmailClaimKeyName);
-                _logger.Info($"Gateway response is for user {email}");
+                var externalUserId = OwinWrapper.GetClaimValue(ControllerConstants.UserExternalIdClaimKeyName);
+                _logger.Info($"Gateway response is for user identity ID {externalUserId}");
 
+                var email = OwinWrapper.GetClaimValue(ControllerConstants.EmailClaimKeyName);
                 var empref = await _employerAccountOrchestrator.GetHmrcEmployerInformation(response.Data.AccessToken, email);
                 _logger.Info($"Gateway response is for empref {empref.Empref} \n {JsonConvert.SerializeObject(empref)}");
 
@@ -120,7 +121,7 @@ namespace SFA.DAS.EAS.Web.Controllers
                 throw;
             }
         }
-        
+
         [HttpGet]
         [Route("summary")]
         public ViewResult Summary()
@@ -210,7 +211,7 @@ namespace SFA.DAS.EAS.Web.Controllers
                 };
 
                 AddFlashMessageToCookie(flashmessage);
-                
+
                 return RedirectToAction(ControllerConstants.IndexActionName, ControllerConstants.EmployerTeamActionName);
             }
 
@@ -234,6 +235,6 @@ namespace SFA.DAS.EAS.Web.Controllers
             return userIdClaim ?? "";
         }
 
-      
+
     }
 }
