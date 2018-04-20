@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using MediatR;
 using SFA.DAS.EAS.Account.Api.Types;
 using SFA.DAS.EAS.Application.Queries.AccountTransactions.GetAccountBalances;
@@ -14,11 +9,15 @@ using SFA.DAS.EAS.Application.Queries.GetLevyDeclarationsByAccountAndPeriod;
 using SFA.DAS.EAS.Application.Queries.GetPagedEmployerAccounts;
 using SFA.DAS.EAS.Application.Queries.GetPayeSchemeByRef;
 using SFA.DAS.EAS.Application.Queries.GetTeamMembers;
-using SFA.DAS.EAS.Domain.Interfaces;
-using SFA.DAS.NLog.Logger;
-using SFA.DAS.HashingService;
-using SFA.DAS.EAS.Application.Queries.AccountTransactions.GetAccountTransferAllowance;
+using SFA.DAS.EAS.Application.Queries.GetTransferAllowance;
 using SFA.DAS.EAS.Domain.Data.Entities.Account;
+using SFA.DAS.HashingService;
+using SFA.DAS.NLog.Logger;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
 
 namespace SFA.DAS.EAS.Account.Api.Orchestrators
 {
@@ -64,7 +63,7 @@ namespace SFA.DAS.EAS.Account.Api.Orchestrators
                     AccountHashId = account.HashedId,
                     IsLevyPayer = true
                 };
-                
+
                 if (accountBalanceHash.TryGetValue(account.Id, out var accountBalance))
                 {
                     accountBalanceModel.Balance = accountBalance.Balance;
@@ -109,7 +108,7 @@ namespace SFA.DAS.EAS.Account.Api.Orchestrators
 
             var viewModel = ConvertAccountDetailToViewModel(accountResult);
 
-            var tasks = new []
+            var tasks = new[]
             {
                 GetBalanceForAccount(accountResult.Account.AccountId),
                 GetTransferAllowanceForAccount(accountResult.Account.AccountId)
@@ -164,7 +163,7 @@ namespace SFA.DAS.EAS.Account.Api.Orchestrators
         {
             _logger.Info($"Requesting team members for account {hashedAccountId}");
 
-            var teamMembers = await _mediator.SendAsync(new GetTeamMembersRequest {HashedAccountId = hashedAccountId});
+            var teamMembers = await _mediator.SendAsync(new GetTeamMembersRequest { HashedAccountId = hashedAccountId });
 
             var memberViewModels = teamMembers.TeamMembers.Select(x => _mapper.Map<TeamMemberViewModel>(x)).ToList();
 
@@ -199,7 +198,7 @@ namespace SFA.DAS.EAS.Account.Api.Orchestrators
         {
             _logger.Info($"Requesting levy declaration for account {hashedAccountId}, year {payrollYear} and month {payrollMonth}");
 
-            var levyDeclarations = await _mediator.SendAsync(new GetLevyDeclarationsByAccountAndPeriodRequest { HashedAccountId = hashedAccountId, PayrollYear = payrollYear, PayrollMonth = payrollMonth});
+            var levyDeclarations = await _mediator.SendAsync(new GetLevyDeclarationsByAccountAndPeriodRequest { HashedAccountId = hashedAccountId, PayrollYear = payrollYear, PayrollMonth = payrollMonth });
             if (levyDeclarations.Declarations == null)
             {
                 return new OrchestratorResponse<AccountResourceList<LevyDeclarationViewModel>> { Data = null };
@@ -281,7 +280,7 @@ namespace SFA.DAS.EAS.Account.Api.Orchestrators
 
         private async Task<decimal> GetTransferAllowanceForAccount(long accountId)
         {
-            var transferAllowanceResult = await _mediator.SendAsync(new GetAccountTransferAllowanceRequest
+            var transferAllowanceResult = await _mediator.SendAsync(new GetTransferAllowanceQuery
             {
                 AccountId = accountId
             });
