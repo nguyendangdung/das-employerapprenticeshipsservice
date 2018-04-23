@@ -18,6 +18,7 @@ using SFA.DAS.EAS.Domain.Models.Levy;
 using SFA.DAS.EAS.TestCommon.ObjectMothers;
 using SFA.DAS.Events.Api.Types;
 using SFA.DAS.HashingService;
+using SFA.DAS.NLog.Logger;
 
 namespace SFA.DAS.EAS.Application.UnitTests.Commands.RefreshEmployerLevyDataTests
 {
@@ -31,6 +32,7 @@ namespace SFA.DAS.EAS.Application.UnitTests.Commands.RefreshEmployerLevyDataTest
         private Mock<ILevyEventFactory> _levyEventFactory;
         private Mock<IGenericEventFactory> _genericEventFactory;
         private Mock<IHashingService> _hashingService;
+        private Mock<ILog> _logger;
         private const string ExpectedEmpRef = "123456";
         private const long ExpectedAccountId = 44321;
 
@@ -39,10 +41,10 @@ namespace SFA.DAS.EAS.Application.UnitTests.Commands.RefreshEmployerLevyDataTest
         {
             _levyRepository = new Mock<IDasLevyRepository>();
             _levyRepository.Setup(x => x.GetLastSubmissionForScheme(ExpectedEmpRef)).ReturnsAsync(new DasDeclaration { LevyDueYtd = 1000m, LevyAllowanceForFullYear = 1200m });
-            
+
             _validator = new Mock<IValidator<RefreshEmployerLevyDataCommand>>();
             _validator.Setup(x => x.Validate(It.IsAny<RefreshEmployerLevyDataCommand>())).Returns(new ValidationResult());
-            
+
             _mediator = new Mock<IMediator>();
 
             _hmrcDateService = new Mock<IHmrcDateService>();
@@ -51,9 +53,10 @@ namespace SFA.DAS.EAS.Application.UnitTests.Commands.RefreshEmployerLevyDataTest
             _levyEventFactory = new Mock<ILevyEventFactory>();
             _genericEventFactory = new Mock<IGenericEventFactory>();
             _hashingService = new Mock<IHashingService>();
+            _logger = new Mock<ILog>();
 
             _refreshEmployerLevyDataCommandHandler = new RefreshEmployerLevyDataCommandHandler(_validator.Object, _levyRepository.Object, _mediator.Object, _hmrcDateService.Object,
-                _levyEventFactory.Object, _genericEventFactory.Object, _hashingService.Object);
+                _levyEventFactory.Object, _genericEventFactory.Object, _hashingService.Object, _logger.Object);
         }
 
         [Test]
@@ -77,6 +80,36 @@ namespace SFA.DAS.EAS.Application.UnitTests.Commands.RefreshEmployerLevyDataTest
         }
 
         [Test]
+        public async Task ThenAnyDuplicateSubmissionIdsFromHmrcAreFiltered()
+        {
+            //Arrange
+            var refreshEmployerLevyDataCommand = RefreshEmployerLevyDataCommandObjectMother.CreateDuplicateHmrcSubmissions(ExpectedEmpRef, ExpectedAccountId);
+
+            //Act
+            await _refreshEmployerLevyDataCommandHandler.Handle(refreshEmployerLevyDataCommand);
+
+            //Assert
+            _levyRepository.Verify(x => x.CreateEmployerDeclarations(
+                It.Is<IEnumerable<DasDeclaration>>(d => d.Count() == 1),
+                It.Is<string>(s => s == ExpectedEmpRef),
+                It.Is<long>(a => a == ExpectedAccountId)
+            ), Times.Once());
+        }
+
+        [Test]
+        public async Task ThenAnyDuplicateSubmissionIdsFromHmrcThatAreFilteredAreLogged()
+        {
+            //Arrange
+            var refreshEmployerLevyDataCommand = RefreshEmployerLevyDataCommandObjectMother.CreateDuplicateHmrcSubmissions(ExpectedEmpRef, ExpectedAccountId);
+
+            //Act
+            await _refreshEmployerLevyDataCommandHandler.Handle(refreshEmployerLevyDataCommand);
+
+            ////Assert
+            _logger.Verify(x => x.Info(It.IsAny<string>()), Times.Once());
+        }
+
+        [Test]
         public async Task ThenTheExistingDeclarationIdsAreCollected()
         {
             //Arrange
@@ -93,7 +126,7 @@ namespace SFA.DAS.EAS.Application.UnitTests.Commands.RefreshEmployerLevyDataTest
         public async Task ThenTheLevyRepositoryIsUpdatedIfTheDeclarationDoesNotExist()
         {
             //Arrange
-            _levyRepository.Setup(x => x.GetEmployerDeclarationSubmissionIds(ExpectedEmpRef)).ReturnsAsync(new List<long>{2});
+            _levyRepository.Setup(x => x.GetEmployerDeclarationSubmissionIds(ExpectedEmpRef)).ReturnsAsync(new List<long> { 2 });
 
             //Act
             await _refreshEmployerLevyDataCommandHandler.Handle(RefreshEmployerLevyDataCommandObjectMother.Create(ExpectedEmpRef, ExpectedAccountId));
@@ -119,7 +152,7 @@ namespace SFA.DAS.EAS.Application.UnitTests.Commands.RefreshEmployerLevyDataTest
         public async Task ThenIfThereAreNoNewDeclarationsThenTheProcessDeclarationEventIsNotPublished()
         {
             //Arrange
-            _levyRepository.Setup(x => x.GetEmployerDeclarationSubmissionIds(ExpectedEmpRef)).ReturnsAsync(new List<long>{1,2,3,4});
+            _levyRepository.Setup(x => x.GetEmployerDeclarationSubmissionIds(ExpectedEmpRef)).ReturnsAsync(new List<long> { 1, 2, 3, 4 });
             var data = RefreshEmployerLevyDataCommandObjectMother.Create(ExpectedEmpRef, ExpectedAccountId);
 
             //Act
@@ -149,7 +182,7 @@ namespace SFA.DAS.EAS.Application.UnitTests.Commands.RefreshEmployerLevyDataTest
         {
             //Arrange
             _hmrcDateService.Setup(x => x.IsSubmissionEndOfYearAdjustment("16-17", 12, It.IsAny<DateTime>())).Returns(true);
-            _levyRepository.Setup(x => x.GetSubmissionByEmprefPayrollYearAndMonth(ExpectedEmpRef,"16-17",12)).ReturnsAsync(new DasDeclaration {LevyDueYtd = 20});
+            _levyRepository.Setup(x => x.GetSubmissionByEmprefPayrollYearAndMonth(ExpectedEmpRef, "16-17", 12)).ReturnsAsync(new DasDeclaration { LevyDueYtd = 20 });
             var data = RefreshEmployerLevyDataCommandObjectMother.CreateEndOfYearAdjustment(ExpectedEmpRef, ExpectedAccountId);
 
             //Act
@@ -165,13 +198,13 @@ namespace SFA.DAS.EAS.Application.UnitTests.Commands.RefreshEmployerLevyDataTest
             //Arrange
             var data = RefreshEmployerLevyDataCommandObjectMother.CreateLevyDataWithFutureSubmissions(ExpectedEmpRef, DateTime.UtcNow, ExpectedAccountId);
             var declaration = data.EmployerLevyData.Last().Declarations.Declarations.Last();
-            _hmrcDateService.Setup(x => x.IsSubmissionForFuturePeriod(declaration.PayrollYear, declaration.PayrollMonth.Value,It.IsAny<DateTime>())).Returns(true);
-            
+            _hmrcDateService.Setup(x => x.IsSubmissionForFuturePeriod(declaration.PayrollYear, declaration.PayrollMonth.Value, It.IsAny<DateTime>())).Returns(true);
+
             //Act
             await _refreshEmployerLevyDataCommandHandler.Handle(data);
 
             //Assert
-            _levyRepository.Verify(x => x.CreateEmployerDeclarations(It.Is<IEnumerable<DasDeclaration>>(c => c.Count() == 4),ExpectedEmpRef,ExpectedAccountId), Times.Once);
+            _levyRepository.Verify(x => x.CreateEmployerDeclarations(It.Is<IEnumerable<DasDeclaration>>(c => c.Count() == 4), ExpectedEmpRef, ExpectedAccountId), Times.Once);
         }
 
         [Test]

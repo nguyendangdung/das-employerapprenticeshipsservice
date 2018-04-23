@@ -10,15 +10,14 @@ Post-Deployment Script Template
 --------------------------------------------------------------------------------------
 */
 
-
-IF (NOT EXISTS(SELECT * FROM [employer_financial].[TopUpPercentage] WHERE Id = 1
-	AND DateFrom = '2015-01-01 00:00:00.000'))
-BEGIN 
-	INSERT INTO [employer_financial].[TopUpPercentage]
-	(DateFrom,Amount)
-	VALUES
+IF NOT EXISTS(SELECT 1 FROM [employer_financial].[TopUpPercentage] WHERE datefrom='2015-01-01 00:00:00.000' and amount=0.1 )
+BEGIN
+	insert into [employer_financial].[TopUpPercentage]
+	(datefrom,amount)
+	values
 	('2015-01-01 00:00:00.000',0.1)
-END 
+END
+
 
 IF (NOT EXISTS(SELECT TransactionType FROM [employer_financial].[TransactionLineTypes] WHERE TransactionType = 1))
 BEGIN
