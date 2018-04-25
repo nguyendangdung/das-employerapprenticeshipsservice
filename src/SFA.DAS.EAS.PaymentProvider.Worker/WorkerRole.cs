@@ -1,4 +1,5 @@
 using Microsoft.WindowsAzure.ServiceRuntime;
+using SFA.DAS.EAS.Application.DependencyResolution;
 using SFA.DAS.EAS.Domain.Configuration;
 using SFA.DAS.EAS.Infrastructure.DependencyResolution;
 using SFA.DAS.EAS.Infrastructure.Logging;
@@ -73,6 +74,7 @@ namespace SFA.DAS.EAS.PaymentProvider.Worker
                 c.Policies.Add(new TopicMessagePublisherPolicy<EmployerApprenticeshipsServiceConfiguration>("SFA.DAS.EmployerApprenticeshipsService", "1.0", new NLogLogger(typeof(TopicMessagePublisher))));
                 c.Policies.Add(new MessageSubscriberPolicy<EmployerApprenticeshipsServiceConfiguration>("SFA.DAS.EmployerApprenticeshipsService"));
                 c.Policies.Add(new ExecutionPolicyPolicy());
+                c.AddRegistry<CachesRegistry>();
                 c.AddRegistry<DefaultRegistry>();
             });
             return result;

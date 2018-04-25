@@ -1,4 +1,9 @@
-﻿using AutoMapper;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
+using AutoMapper;
 using SFA.DAS.Commitments.Api.Client.Interfaces;
 using SFA.DAS.Commitments.Api.Types.Apprenticeship;
 using SFA.DAS.EAS.Domain.Interfaces;
@@ -7,14 +12,9 @@ using SFA.DAS.EAS.Domain.Models.ApprenticeshipProvider;
 using SFA.DAS.EAS.Domain.Models.Payments;
 using SFA.DAS.EAS.Domain.Models.Transfers;
 using SFA.DAS.EAS.Infrastructure.Caching;
-using SFA.DAS.NLog.Logger;
 using SFA.DAS.Provider.Events.Api.Client;
 using SFA.DAS.Provider.Events.Api.Types;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
+using SFA.DAS.NLog.Logger;
 using Payment = SFA.DAS.Provider.Events.Api.Types.Payment;
 
 namespace SFA.DAS.EAS.Infrastructure.Services
@@ -26,16 +26,16 @@ namespace SFA.DAS.EAS.Infrastructure.Services
         private readonly IApprenticeshipInfoServiceWrapper _apprenticeshipInfoService;
         private readonly IMapper _mapper;
         private readonly ILog _logger;
-        private readonly ICacheProvider _cacheProvider;
+        private readonly IInProcessCache _inProcessCache;
 
-        public PaymentService(IPaymentsEventsApiClient paymentsEventsApiClient, IEmployerCommitmentApi commitmentsApiClient, IApprenticeshipInfoServiceWrapper apprenticeshipInfoService, IMapper mapper, ILog logger, ICacheProvider cacheProvider)
+        public PaymentService(IPaymentsEventsApiClient paymentsEventsApiClient, IEmployerCommitmentApi commitmentsApiClient, IApprenticeshipInfoServiceWrapper apprenticeshipInfoService, IMapper mapper, ILog logger, IInProcessCache inProcessCache)
         {
             _paymentsEventsApiClient = paymentsEventsApiClient;
             _commitmentsApiClient = commitmentsApiClient;
             _apprenticeshipInfoService = apprenticeshipInfoService;
             _mapper = mapper;
             _logger = logger;
-            _cacheProvider = cacheProvider;
+            _inProcessCache = inProcessCache;
         }
 
         public async Task<ICollection<PaymentDetails>> GetAccountPayments(string periodEnd, long employerAccountId)
@@ -178,17 +178,17 @@ namespace SFA.DAS.EAS.Infrastructure.Services
             {
                 try
                 {
-                    var providerView = _cacheProvider.Get<ProvidersView>($"{nameof(ProvidersView)}_{ukPrn}");
+                    var providerView = _inProcessCache.Get<ProvidersView>($"{nameof(ProvidersView)}_{ukPrn}");
 
                     if (providerView == null)
                     {
                         providerView = _apprenticeshipInfoService.GetProvider(ukPrn);
                         if (providerView != null)
                         {
-                            _cacheProvider.Set($"{nameof(ProvidersView)}_{ukPrn}", providerView, new TimeSpan(1, 0, 0));
+                            _inProcessCache.Set($"{nameof(ProvidersView)}_{ukPrn}", providerView, new TimeSpan(1, 0, 0));
                         }
                     }
-
+                    
                     return providerView?.Provider;
                 }
                 catch (Exception e)
@@ -204,7 +204,7 @@ namespace SFA.DAS.EAS.Infrastructure.Services
         {
             try
             {
-                var standardsView = _cacheProvider.Get<StandardsView>(nameof(StandardsView));
+                var standardsView = _inProcessCache.Get<StandardsView>(nameof(StandardsView));
 
                 if (standardsView != null)
                     return standardsView.Standards?.SingleOrDefault(s => s.Code.Equals(standardCode));
@@ -213,7 +213,7 @@ namespace SFA.DAS.EAS.Infrastructure.Services
 
                 if (standardsView != null)
                 {
-                    _cacheProvider.Set(nameof(StandardsView), standardsView, new TimeSpan(1, 0, 0));
+                    _inProcessCache.Set(nameof(StandardsView), standardsView, new TimeSpan(1, 0, 0));
                 }
 
                 return standardsView?.Standards?.SingleOrDefault(s => s.Code.Equals(standardCode));
@@ -230,7 +230,7 @@ namespace SFA.DAS.EAS.Infrastructure.Services
         {
             try
             {
-                var frameworksView = _cacheProvider.Get<FrameworksView>(nameof(FrameworksView));
+                var frameworksView = _inProcessCache.Get<FrameworksView>(nameof(FrameworksView));
 
                 if (frameworksView != null)
                     return frameworksView.Frameworks.SingleOrDefault(f =>
@@ -242,7 +242,7 @@ namespace SFA.DAS.EAS.Infrastructure.Services
 
                 if (frameworksView != null)
                 {
-                    _cacheProvider.Set(nameof(FrameworksView), frameworksView, new TimeSpan(1, 0, 0));
+                    _inProcessCache.Set(nameof(FrameworksView),frameworksView, new TimeSpan(1,0,0));
                 }
 
                 return frameworksView?.Frameworks.SingleOrDefault(f =>

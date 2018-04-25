@@ -1,15 +1,14 @@
-﻿using SFA.DAS.Apprenticeships.Api.Client;
-using SFA.DAS.Apprenticeships.Api.Types;
-using SFA.DAS.Apprenticeships.Api.Types.Exceptions;
-using SFA.DAS.EAS.Domain.Configuration;
-using SFA.DAS.EAS.Domain.Interfaces;
-using SFA.DAS.EAS.Domain.Models.ApprenticeshipCourse;
-using SFA.DAS.EAS.Domain.Models.ApprenticeshipProvider;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using SFA.DAS.Apprenticeships.Api.Client;
+using SFA.DAS.Apprenticeships.Api.Types;
+using SFA.DAS.Apprenticeships.Api.Types.Exceptions;
+using SFA.DAS.EAS.Domain.Interfaces;
+using SFA.DAS.EAS.Domain.Models.ApprenticeshipCourse;
+using SFA.DAS.EAS.Domain.Models.ApprenticeshipProvider;
 using Framework = SFA.DAS.EAS.Domain.Models.ApprenticeshipCourse.Framework;
 using Standard = SFA.DAS.EAS.Domain.Models.ApprenticeshipCourse.Standard;
 
@@ -20,43 +19,41 @@ namespace SFA.DAS.EAS.Application.Services
         private const string StandardsKey = "Standards";
         private const string FrameworksKey = "Frameworks";
 
-        private readonly ICache _cache;
-        private readonly string _apprenticeshipInfoServiceApiBase;
+        private readonly IInProcessCache _cache;
 
-        public ApprenticeshipInfoServiceWrapper(ICache cache, EmployerApprenticeshipsServiceConfiguration config)
+        public ApprenticeshipInfoServiceWrapper(IInProcessCache cache)
         {
-            if (cache == null)
-                throw new ArgumentNullException(nameof(cache));
-            _cache = cache;
-            _apprenticeshipInfoServiceApiBase = config?.ApprenticeshipInfoService?.BaseUrl;
+            _cache = cache ?? throw new ArgumentNullException(nameof(cache));
         }
 
-        public async Task<StandardsView> GetStandardsAsync(bool refreshCache = false)
+        public Task<StandardsView> GetStandardsAsync(bool refreshCache = false)
         {
-            if (!await _cache.ExistsAsync(StandardsKey) || refreshCache)
+            if (!_cache.Exists(StandardsKey) || refreshCache)
             {
-                var api = new StandardApiClient(_apprenticeshipInfoServiceApiBase);
+                var api = new StandardApiClient();
 
+                //BUG: FindAll should be FindAllAsync - currently a blocking call.
                 var standards = api.FindAll().OrderBy(x => x.Title).ToList();
 
-                await _cache.SetCustomValueAsync(StandardsKey, MapFrom(standards));
+                _cache.Set(StandardsKey, MapFrom(standards));
             }
 
-            return await _cache.GetCustomValueAsync<StandardsView>(StandardsKey);
+            return Task.FromResult(_cache.Get<StandardsView>(StandardsKey));
         }
 
-        public async Task<FrameworksView> GetFrameworksAsync(bool refreshCache = false)
+        public Task<FrameworksView> GetFrameworksAsync(bool refreshCache = false)
         {
-            if (!await _cache.ExistsAsync(FrameworksKey) || refreshCache)
+            if (!_cache.Exists(FrameworksKey) || refreshCache)
             {
-                var api = new FrameworkApiClient(_apprenticeshipInfoServiceApiBase);
+                var api = new FrameworkApiClient();
 
+                //BUG: FindAll should be FindAllAsync
                 var frameworks = api.FindAll().OrderBy(x => x.Title).ToList();
 
-                await _cache.SetCustomValueAsync(FrameworksKey, MapFrom(frameworks));
+                _cache.Set(FrameworksKey, MapFrom(frameworks));
             }
 
-            return await _cache.GetCustomValueAsync<FrameworksView>(FrameworksKey);
+            return Task.FromResult(_cache.Get<FrameworksView>(FrameworksKey));
         }
 
         public ProvidersView GetProvider(long ukPrn)
@@ -125,7 +122,7 @@ namespace SFA.DAS.EAS.Application.Services
                     Code = long.Parse(x.Id),
                     Level = x.Level,
                     Title = GetTitle(x.Title, x.Level) + " (Standard)",
-                    CourseName = x.Title,
+                    CourseName = x.Title, 
                     Duration = x.Duration,
                     MaxFunding = x.MaxFunding
                 }).ToList()

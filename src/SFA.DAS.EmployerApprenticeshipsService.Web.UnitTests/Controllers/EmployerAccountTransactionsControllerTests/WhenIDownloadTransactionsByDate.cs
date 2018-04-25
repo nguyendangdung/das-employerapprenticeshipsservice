@@ -8,6 +8,8 @@ using SFA.DAS.EAS.Application.Queries.GetTransactionsDownload;
 using SFA.DAS.EAS.Application.Queries.GetTransactionsDownloadResultViewModel;
 using SFA.DAS.EAS.Domain.Interfaces;
 using SFA.DAS.EAS.Domain.Models.Transaction;
+using SFA.DAS.EAS.Infrastructure.Authentication;
+using SFA.DAS.EAS.Infrastructure.Authorization;
 using SFA.DAS.EAS.Web.Authentication;
 using SFA.DAS.EAS.Web.Controllers;
 using SFA.DAS.EAS.Web.Orchestrators;
@@ -29,7 +31,7 @@ namespace SFA.DAS.EAS.Web.UnitTests.Controllers.EmployerAccountTransactionsContr
 
         private EmployerAccountTransactionsController _controller;
         private Mock<IAuthenticationService> _owinWrapper;
-        private Mock<IFeatureToggleService> _featureToggle;
+        private Mock<IAuthorizationService> _featureToggle;
         private Mock<IHashingService> _hashingService;
         private Mock<IMediator> _mediator;
         private Mock<EmployerAccountTransactionsOrchestrator> _orchestrator;
@@ -59,7 +61,7 @@ namespace SFA.DAS.EAS.Web.UnitTests.Controllers.EmployerAccountTransactionsContr
             };
 
             _owinWrapper = new Mock<IAuthenticationService>();
-            _featureToggle = new Mock<IFeatureToggleService>();
+            _featureToggle = new Mock<IAuthorizationService>();
             _hashingService = new Mock<IHashingService>();
             _mediator = new Mock<IMediator>();
             _orchestrator = new Mock<EmployerAccountTransactionsOrchestrator>();
