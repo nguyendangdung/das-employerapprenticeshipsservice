@@ -5,8 +5,6 @@
 |               |               |
 | ------------- | ------------- |
 |![crest](https://assets.publishing.service.gov.uk/government/assets/crests/org_crest_27px-916806dcf065e7273830577de490d5c7c42f36ddec83e907efe62086785f24fb.png)|Employer Apprenticeship Service|
-| Build | ![Build Status](https://sfa-gov-uk.visualstudio.com/_apis/public/build/definitions/c39e0c0b-7aff-4606-b160-3566f3bbce23/101/badge) |
-| Web  | https://manage-apprenticeships.service.gov.uk/  |
 
 ## Generate Agreements Job
 
@@ -23,7 +21,7 @@ It finds the latest agreement template Id and then scans the database looking fo
 The class GenerateAgreementsIdProvider will identify the latest agreement using the IEmployerAgreementRepository.GetLatestAgreementTemplate() method. It will then return batches of legal entity ids that do not already have this agreement using the method ILegalEntityRepository.GetLegalEntitiesWithoutSpecificAgreement. Each legal entity id found is passed to GenerateAgreementsIdProcessor.DoAsync(...) method which will then find all accounts linked to the legal entity#1 and for each legal entity and account combination it will invoke the CreateEmployerAgreementCommand which, in turn, will call EmployerAgreementRepository.CreateEmployerAgreeement. This will do the usual stuff when an agreement is created, including raising the appropriate event to create the task.
 
 ## How do I run this
-Post an ad-hoc job message specifying a job name of **GenerateAgreementsJob**. See [Running Jobs](RunningJobs.MD "Running jobs")
+Post an ad-hoc job message specifying a job name of **GenerateAgreementsJob**. See [Running Jobs](RunningJobs.md "Running jobs")
 
 ## I'm worried - how can I tell what it's doing?
 
@@ -41,7 +39,8 @@ That aside, the following messages will be written to [Kibana](https://dev-elk.f
 There are no intervening log messages unless something fails.
 
 
-##Can I check in the database if something is happening?
+## Can I check in the database if something is happening?
+
 
 You can run the following query. 
 

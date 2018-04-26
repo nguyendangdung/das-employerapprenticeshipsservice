@@ -5,8 +5,6 @@
 |               |               |
 | ------------- | ------------- |
 |![crest](https://assets.publishing.service.gov.uk/government/assets/crests/org_crest_27px-916806dcf065e7273830577de490d5c7c42f36ddec83e907efe62086785f24fb.png)|Employer Apprenticeship Service|
-| Build | ![Build Status](https://sfa-gov-uk.visualstudio.com/_apis/public/build/definitions/c39e0c0b-7aff-4606-b160-3566f3bbce23/101/badge) |
-| Web  | https://manage-apprenticeships.service.gov.uk/  |
 
 ## Running Jobs
 
@@ -34,17 +32,17 @@ ListTriggeredJobs               | No                              |
 Old style jobs have a dedicated CLI.
 
 
-## How do I execute a new style job?
+# How do I execute a new style job?
 
-The new style jobs may have a dedicated 'trigger' that causes it to run automatically. For example, on a timer basis or in response to posting a message to a queue. However, any job may be invoked manually by posting a message to the a specific queue.
+The new style jobs may have a dedicated 'trigger' that causes it to run automatically. For example, on a timer basis or in response to posting a message to a queue. However, any job may be invoked manually by posting a message to a specific queue named adhocjobs (see below).
 
-###Running a Job Manually
+#Running a Job Manually
 
 
 > The objective here is to get a message into the queue named **adhocjobs** in the storage account used by the **SFA.DAS.EAS.Account.Worker** worker role.
  
 
-You will need a tool such as [Microsoft Azure Storage Explorer](https://azure.microsoft.com/en-us/features/storage-explorer/ "Microsoft Azure Storage Explorer") that allows you to post a message to an [Azure Storage Queues](https://azure.microsoft.com/en-gb/services/storage/queues "Azure Storage Queue"). The following screen shots will reference to Microsoft Azure Storage Explorer.
+You will need a tool such as [Microsoft Azure Storage Explorer](https://azure.microsoft.com/en-us/features/storage-explorer/ "Microsoft Azure Storage Explorer") that allows you to post messages to [Azure Storage Queues](https://azure.microsoft.com/en-gb/services/storage/queues "Azure Storage Queue"). The following screen shots will reference Microsoft Azure Storage Explorer.
  
 
 ##Connect the tool to the  required storage account
@@ -57,7 +55,7 @@ You will need a tool such as [Microsoft Azure Storage Explorer](https://azure.mi
 ![Open Account](AzureStorage_2.png)
 
 
-The json message is posted to a queue named ashocjobs and is structured as follows:
+The json message is posted to a queue named adhocjobs and is structured as follows:
 
     
     {
@@ -67,7 +65,7 @@ The json message is posted to a queue named ashocjobs and is structured as follo
 
 The value chosen for JobName, which is not case sensitive, must be the name of a .net class (without the namespace prefix) that implements the IJob interface.
  
-Once the message is posted to the queue it should disappear from the queue relatively quickly (anything from almost immediately up to a minute or so). This means the message has been picked up by the worker role hosting the web job and it is being processed.
+Once the message is posted to the queue it should disappear from the queue relatively quickly (anything from almost immediately up to a minute or so). A message disappears from the queue when it has been picked up by the worker role hosting the web job and it is being processed.
  
 
 **If the message does not disappear from the queue:**
@@ -77,12 +75,16 @@ Once the message is posted to the queue it should disappear from the queue relat
 
 
 **If the message appears in the adhocjobs_deadletter queue**
+
 - the message has caused a run time exception and could not be processed. Check Kibana for error messages.
 
  
-**If the message does appear in the dead letter queue but the job does not appear to do anything**
+**If the message disappears and does not appear in the dead letter queue but the job does not appear to do anything**
+
 - check that the correct job name was specified
+- check the Kibana logs for errors
      
 
-##Specific Jobs Details
-[Generate Agreements](GenerateAgreements.md "Generate Agreements")
+## Specific Jobs Details
+
+* [Generate Agreements](GenerateAgreements.md "Generate Agreements")
