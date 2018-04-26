@@ -95,5 +95,6 @@ Using `"Action": "*"` can also be used to disable all actions on the controller.
 [Visual Studio]: https://www.visualstudio.com
 
 ## See Also
-[Integration Tests](IntegrationTesting.md)
-[Authorization Pipeline](Authorization Pipeline.md)
+* [Integration Tests](Docs/IntegrationTesting.md "Integration Testing")
+* [Authorization Pipeline](Docs/AuthorizationPipeline.md "Authorization Pipeline")
+* [Running Jobs](Docs/jobs/RunningJobs.md "Running Jobs")
