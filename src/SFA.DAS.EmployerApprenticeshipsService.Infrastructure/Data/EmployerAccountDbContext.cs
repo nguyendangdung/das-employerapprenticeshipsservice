@@ -20,6 +20,7 @@ namespace SFA.DAS.EAS.Infrastructure.Data
         public virtual DbSet<TransferConnectionInvitation> TransferConnectionInvitations { get; set; }
         public virtual DbSet<TransferRequest> TransferRequests { get; set; }
         public virtual DbSet<User> Users { get; set; }
+        public virtual DbSet<UserAccountSetting> UserAccountSettings { get; set; }
 
         public Guid Id { get; set; }
 
@@ -67,6 +68,10 @@ namespace SFA.DAS.EAS.Infrastructure.Data
                 .Ignore(u => u.FullName)
                 .Ignore(u => u.UserRef)
                 .Property(u => u.ExternalId).HasColumnName(nameof(User.UserRef));
+
+            modelBuilder.Entity<UserAccountSetting>()
+                .HasKey(uas => new { uas.Id })
+                .ToTable("UserAccountSettings");
         }
     }
 }
